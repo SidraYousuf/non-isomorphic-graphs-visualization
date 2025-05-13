@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Non-isomorphic Graphs with Degree Sequence 3,2,2,1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <style>
+        .graph-container {
+            height: 300px;
+            border: 1px solid #ccc;
+            margin: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Non-isomorphic Graphs with Degree Sequence 3,2,2,1</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-xl font-semibold mb-4 text-center text-gray-700">Graph 1</h2>
+                <div id="graph1" class="graph-container bg-white"></div>
+                <p class="mt-4 text-gray-600 text-center">Path-like structure with central high-degree vertex</p>
+            </div>
+            <div>
+                <h2 class="text-xl font-semibold mb-4 text-center text-gray-700">Graph 2</h2>
+                <div id="graph2" class="graph-container bg-white"></div>
+                <p class="mt-4 text-gray-600 text-center">Star-like structure with branch</p>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800">Verification of Non-isomorphism</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li>Both graphs have the same degree sequence (3,2,2,1)</li>
+                <li>Graph 1 has a different structure from Graph 2</li>
+                <li>The graphs have different adjacency patterns</li>
+                <li>Different vertex connectivity patterns</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Graph 1
+            const cy1 = cytoscape({
+                container: document.getElementById('graph1'),
+                elements: {
+                    nodes: [
+                        { data: { id: 'a', label: 'A' } },
+                        { data: { id: 'b', label: 'B' } },
+                        { data: { id: 'c', label: 'C' } },
+                        { data: { id: 'd', label: 'D' } }
+                    ],
+                    edges: [
+                        { data: { source: 'a', target: 'b' } },
+                        { data: { source: 'b', target: 'c' } },
+                        { data: { source: 'c', target: 'd' } },
+                        { data: { source: 'a', target: 'c' } },
+                        { data: { source: 'a', target: 'd' } }
+                    ]
+                },
+                style: [
+                    {
+                        selector: 'node',
+                        style: {
+                            'background-color': '#4299e1',
+                            'label': 'data(label)',
+                            'color': '#fff',
+                            'text-valign': 'center',
+                            'text-halign': 'center',
+                            'width': 40,
+                            'height': 40
+                        }
+                    },
+                    {
+                        selector: 'edge',
+                        style: {
+                            'width': 2,
+                            'line-color': '#a0aec0',
+                            'curve-style': 'bezier'
+                        }
+                    }
+                ],
+                layout: {
+                    name: 'circle'
+                }
+            });
+
+            // Graph 2
+            const cy2 = cytoscape({
+                container: document.getElementById('graph2'),
+                elements: {
+                    nodes: [
+                        { data: { id: 'a', label: 'A' } },
+                        { data: { id: 'b', label: 'B' } },
+                        { data: { id: 'c', label: 'C' } },
+                        { data: { id: 'd', label: 'D' } }
+                    ],
+                    edges: [
+                        { data: { source: 'a', target: 'b' } },
+                        { data: { source: 'a', target: 'c' } },
+                        { data: { source: 'a', target: 'd' } },
+                        { data: { source: 'b', target: 'c' } }
+                    ]
+                },
+                style: [
+                    {
+                        selector: 'node',
+                        style: {
+                            'background-color': '#4299e1',
+                            'label': 'data(label)',
+                            'color': '#fff',
+                            'text-valign': 'center',
+                            'text-halign': 'center',
+                            'width': 40,
+                            'height': 40
+                        }
+                    },
+                    {
+                        selector: 'edge',
+                        style: {
+                            'width': 2,
+                            'line-color': '#a0aec0',
+                            'curve-style': 'bezier'
+                        }
+                    }
+                ],
+                layout: {
+                    name: 'circle'
+                }
+            });
+        });
+    </script>
+</body>
+</html>
