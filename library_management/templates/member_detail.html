@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow-lg p-6">
+    <!-- Member Information -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-4">{{ member.name }}</h1>
+        <div class="space-y-2">
+            <p class="text-gray-600">
+                <i class="fas fa-envelope mr-2"></i>{{ member.email }}
+            </p>
+            <p class="text-gray-600">
+                <i class="fas fa-calendar mr-2"></i>Member since: {{ member.join_date.strftime('%B %d, %Y') }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Current Loans -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Current Loans</h2>
+        {% set active_loans = member.loans|selectattr('return_date', 'none')|list %}
+        {% if active_loans %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for loan in active_loans %}
+            <div class="bg-gray-50 rounded-lg p-4 shadow">
+                <div class="flex items-start space-x-4">
+                    <img src="{{ loan.book.cover_image }}" alt="{{ loan.book.title }}" 
+                         class="w-20 h-28 object-cover rounded">
+                    <div>
+                        <h3 class="font-semibold">{{ loan.book.title }}</h3>
+                        <p class="text-sm text-gray-600">{{ loan.book.author }}</p>
+                        <p class="text-sm text-gray-500 mt-2">
+                            <i class="fas fa-calendar-alt mr-1"></i>
+                            Due: {{ loan.return_date.strftime('%Y-%m-%d') }}
+                        </p>
+                        {% set days_remaining = (loan.return_date - now).days %}
+                        <p class="mt-2 text-sm {% if days_remaining < 0 %}text-red-600{% elif days_remaining < 3 %}text-yellow-600{% else %}text-green-600{% endif %}">
+                            {% if days_remaining < 0 %}
+                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                Overdue by {{ abs(days_remaining) }} days
+                            {% elif days_remaining == 0 %}
+                                <i class="fas fa-clock mr-1"></i>
+                                Due today
+                            {% else %}
+                                <i class="fas fa-clock mr-1"></i>
+                                {{ days_remaining }} days remaining
+                            {% endif %}
+                        </p>
+                        <a href="{{ url_for('return_book', book_id=loan.book.id) }}" 
+                           class="inline-block mt-2 text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-undo mr-1"></i>Return Book
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500">No current loans.</p>
+        {% endif %}
+    </div>
+
+    <!-- Loan History -->
+    <div>
+        <h2 class="text-2xl font-semibold mb-4">Loan History</h2>
+        {% set past_loans = member.loans|selectattr('return_date')|list %}
+        {% if past_loans %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loan Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Return Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for loan in past_loans|sort(attribute='loan_date', reverse=true) %}
+                    <tr>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <img src="{{ loan.book.cover_image }}" alt="{{ loan.book.title }}" 
+                                     class="w-12 h-16 object-cover rounded mr-3">
+                                <div>
+                                    <div class="font-medium">{{ loan.book.title }}</div>
+                                    <div class="text-sm text-gray-500">{{ loan.book.author }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {{ loan.loan_date.strftime('%Y-%m-%d') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {{ loan.return_date.strftime('%Y-%m-%d') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% set return_status = 'On time' if loan.return_date <= loan.due_date else 'Late' %}
+                            <span class="px-2 py-1 text-xs rounded-full 
+                                       {% if return_status == 'On time' %}bg-green-100 text-green-800
+                                       {% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ return_status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-gray-500">No loan history available.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
